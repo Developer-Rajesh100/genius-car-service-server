@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 
 const port = process.env.PORT || 5000;
@@ -32,27 +32,113 @@ async function run() {
         const serviceCollection = client
             .db("genius-car-service")
             .collection("service");
+        const reviewCollection = client
+            .db("genius-car-service")
+            .collection("review");
 
-        // Banner Image API
+        // Banner Image API (Get)
         app.get("/banner", async (req, res) => {
             const query = {};
             const cursor = bannerCollection.find(query);
             const banners = await cursor.toArray();
             res.send(banners);
         });
-        // About API
+
+        // About API (Get)
         app.get("/about", async (req, res) => {
             const query = {};
             const cursor = aboutCollection.find(query);
             const abouts = await cursor.toArray();
             res.send(abouts);
         });
-        // Service API
+
+        // Service API (Get)
         app.get("/service", async (req, res) => {
             const query = {};
             const cursor = serviceCollection.find(query);
             const services = await cursor.toArray();
             res.send(services);
+        });
+
+        //Review API (Get)
+        app.get("/review", async (req, res) => {
+            const query = {};
+            const cursor = reviewCollection.find(query);
+            const reviews = await cursor.toArray();
+            res.send(reviews);
+        });
+
+        // Review API (POST)
+        app.post("/review", async (req, res) => {
+            const review = req.body;
+            const result = await reviewCollection.insertOne(review);
+            res.send(result);
+        });
+
+        // About API (PUT)
+        app.put("/about/:id", async (req, res) => {
+            const id = req.params.id;
+            console.log(id);
+            const data = req.body;
+            const filter = { _id: ObjectId(id) };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: {
+                    image: data.image,
+                    title: data.title,
+                    content: data.content,
+                },
+            };
+            const result = await aboutCollection.updateOne(
+                filter,
+                updateDoc,
+                options
+            );
+            res.send(result);
+        });
+
+        // Service API (PUT)
+        app.put("/service/:id", async (req, res) => {
+            const id = req.params.id;
+            console.log(id);
+            const data = req.body;
+            const filter = { _id: ObjectId(id) };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: {
+                    image: data.image,
+                    title: data.title,
+                    content: data.content,
+                },
+            };
+            const result = await serviceCollection.updateOne(
+                filter,
+                updateDoc,
+                options
+            );
+            res.send(result);
+        });
+
+        //Banner API (PUT)
+        app.put("/banner/:id", async (req, res) => {
+            const id = req.params.id;
+            console.log(id);
+            const data = req.body;
+            const filter = { _id: ObjectId(id) };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: {
+                    img1: data.img1,
+                    img2: data.img2,
+                    img3: data.img3,
+                },
+            };
+            const result = await bannerCollection.updateOne(
+                filter,
+                updateDoc,
+                options
+            );
+            res.send(result);
         });
     } finally {
     }
