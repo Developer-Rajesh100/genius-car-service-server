@@ -35,6 +35,9 @@ async function run() {
         const reviewCollection = client
             .db("genius-car-service")
             .collection("review");
+        const userCollection = client
+            .db("genius-car-service")
+            .collection("user");
 
         // Banner Image API (Get)
         app.get("/banner", async (req, res) => {
@@ -68,10 +71,25 @@ async function run() {
             res.send(reviews);
         });
 
+        //User API (Get)
+        app.get("/user", async (req, res) => {
+            const query = {};
+            const cursor = userCollection.find(query);
+            const users = await cursor.toArray();
+            res.send(users);
+        });
+
         // Review API (POST)
         app.post("/review", async (req, res) => {
             const review = req.body;
             const result = await reviewCollection.insertOne(review);
+            res.send(result);
+        });
+
+        // User API (POST)
+        app.post("/user", async (req, res) => {
+            const user = req.body;
+            const result = await userCollection.insertOne(user);
             res.send(result);
         });
 
